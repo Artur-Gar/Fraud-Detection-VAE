@@ -3,7 +3,6 @@ from torch.utils.data import Dataset, DataLoader
 
 class FraudDataset(Dataset):
     """
-    Identical to Quentin's dataset:
     - X float32
     - y float32 with shape (n, 1)
     """

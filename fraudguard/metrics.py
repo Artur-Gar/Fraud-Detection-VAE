@@ -3,7 +3,6 @@ from sklearn.metrics import precision_recall_curve
 
 def find_best_threshold_by_f1(y_true, y_scores):
     """
-    Exactly what you did:
     - precision_recall_curve gives precision/recall/thresholds
     - compute F1 for each threshold
     - pick argmax
