@@ -32,17 +32,18 @@ The system is designed for extremely imbalanced settings (< 0.2% fraud) and emph
 
 <div align="center">
 
-**Supervised Baseline**
+<b>Supervised Baseline</b><br>
 <img src="notebooks/output_baseline_conformal/conformal_baseline_auc.png" width="45%">
 <img src="notebooks/output_baseline_conformal/conformal_baseline_pr.png" width="45%">
 
 <br><br>
 
-**VAE (Unsupervised)**
+<b>VAE (Unsupervised)</b><br>
 <img src="notebooks/outputs_vae_conformal/conformal_vae_roc.png" width="45%">
 <img src="notebooks/outputs_vae_conformal/conformal_vae_pr.png" width="45%">
 
 </div>
+
 
 ---
 
