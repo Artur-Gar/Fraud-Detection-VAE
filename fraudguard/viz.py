@@ -39,16 +39,27 @@ def _add_annotation_legend_with_arrows(ax, points, title=None,
             annotation_clip=False
         )
 
-def plot_roc_pr_with_conformal_points(y_true, scores, taus_by_alpha, title_prefix=""):
+
+def plot_roc_pr_with_conformal_points(
+    y_true,
+    scores,
+    taus_by_alpha,
+    best_f1_tau=None,
+    f1=None,
+    title_prefix=""
+):
     """
     y_true: 0/1 labels
     scores: higher => more fraud
     taus_by_alpha: dict {alpha: tau}
+    best_f1_tau: scalar threshold corresponding to best F1 score (optional)
     """
     y_true = np.asarray(y_true).reshape(-1).astype(int)
     scores = np.asarray(scores).reshape(-1)
 
+    # ============================
     # ROC
+    # ============================
     fpr_curve, tpr_curve, _ = roc_curve(y_true, scores)
     roc_auc = auc(fpr_curve, tpr_curve)
 
@@ -57,6 +68,8 @@ def plot_roc_pr_with_conformal_points(y_true, scores, taus_by_alpha, title_prefi
     ax.plot(fpr_curve, tpr_curve, label=f"ROC curve (AUC={roc_auc:.4f})")
 
     roc_points = []
+
+    # conformal taus -> red points
     for a, tau in taus_by_alpha.items():
         y_pred = (scores > tau).astype(int)
         fp = ((y_true == 0) & (y_pred == 1)).sum()
@@ -69,6 +82,25 @@ def plot_roc_pr_with_conformal_points(y_true, scores, taus_by_alpha, title_prefi
         ax.scatter([fpr], [tpr], c="red", s=60, zorder=5)
         roc_points.append((f"α={a:.2%}", fpr, tpr))
 
+    # best F1 threshold -> green point
+    if best_f1_tau is not None:
+        y_pred_best = (scores > best_f1_tau).astype(int)
+        fp = ((y_true == 0) & (y_pred_best == 1)).sum()
+        tn = ((y_true == 0) & (y_pred_best == 0)).sum()
+        tp = ((y_true == 1) & (y_pred_best == 1)).sum()
+        fn = ((y_true == 1) & (y_pred_best == 0)).sum()
+        fpr_best = fp / (fp + tn + 1e-12)
+        tpr_best = tp / (tp + fn + 1e-12)
+
+        ax.scatter(
+            [fpr_best],
+            [tpr_best],
+            c="green",
+            s=70,
+            zorder=6,
+            label=f"best f1 score treshold: f1={f1}",
+        )
+
     roc_points.sort(key=lambda t: t[1])
     _add_annotation_legend_with_arrows(ax, roc_points, title="Conformal points")
 
@@ -80,7 +112,9 @@ def plot_roc_pr_with_conformal_points(y_true, scores, taus_by_alpha, title_prefi
     plt.tight_layout(rect=[0, 0, 0.82, 1])
     plt.show()
 
+    # ============================
     # PR
+    # ============================
     precision_curve, recall_curve, _ = precision_recall_curve(y_true, scores)
     ap = average_precision_score(y_true, scores)
 
@@ -89,6 +123,8 @@ def plot_roc_pr_with_conformal_points(y_true, scores, taus_by_alpha, title_prefi
     ax.plot(recall_curve, precision_curve, label=f"PR curve (AP={ap:.4f})")
 
     pr_points = []
+
+    # conformal taus -> red points
     for a, tau in taus_by_alpha.items():
         y_pred = (scores > tau).astype(int)
         fp = ((y_true == 0) & (y_pred == 1)).sum()
@@ -100,6 +136,25 @@ def plot_roc_pr_with_conformal_points(y_true, scores, taus_by_alpha, title_prefi
 
         ax.scatter([recall], [precision], c="red", s=60, zorder=5)
         pr_points.append((f"α={a:.2%}", recall, precision))
+
+    # best F1 threshold -> green point
+    if best_f1_tau is not None:
+        y_pred_best = (scores > best_f1_tau).astype(int)
+        fp = ((y_true == 0) & (y_pred_best == 1)).sum()
+        tp = ((y_true == 1) & (y_pred_best == 1)).sum()
+        fn = ((y_true == 1) & (y_pred_best == 0)).sum()
+
+        recall_best = tp / (tp + fn + 1e-12)
+        precision_best = tp / (tp + fp + 1e-12)
+
+        ax.scatter(
+            [recall_best],
+            [precision_best],
+            c="green",
+            s=70,
+            zorder=6,
+            label=f"best f1 score treshold: f1={f1}",
+        )
 
     pr_points.sort(key=lambda t: t[1])
     _add_annotation_legend_with_arrows(ax, pr_points, title="Conformal points")

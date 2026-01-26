@@ -16,43 +16,12 @@ def conformal_outlier_threshold(scores_clean: np.ndarray, alpha: float) -> float
     k = min(max(k, 1), n)
     return float(s[k - 1])
 
-def conformal_pvalues_upper_tail(scores_clean: np.ndarray, scores_x: np.ndarray) -> np.ndarray:
-    """
-    Upper-tail conformal p-values:
-    p(x) = (1 + #{i: s_i >= s(x)}) / (n + 1)
-    Outlier at level alpha <=> p(x) <= alpha
-    """
-    s = np.asarray(scores_clean).reshape(-1)
-    t = np.asarray(scores_x).reshape(-1)
-    n = len(s)
-
-    ge = (s[None, :] >= t[:, None]).sum(axis=1)
-    return (1.0 + ge) / (n + 1.0)
-
 def confusion_from_scores(y_true: np.ndarray, scores: np.ndarray, tau: float):
-    """
-    Generic confusion + rates for any score where larger => more 'fraud/outlier'.
-    Rule: predict 1 if score > tau else 0.
-
-    Returns dict with tn/fp/fn/tp and fpr/tpr/precision.
-    """
-    y_true = np.asarray(y_true).reshape(-1).astype(int)
-    scores = np.asarray(scores).reshape(-1)
-    y_pred = (scores > tau).astype(int)
-
-    tn = int(((y_true == 0) & (y_pred == 0)).sum())
-    fp = int(((y_true == 0) & (y_pred == 1)).sum())
-    fn = int(((y_true == 1) & (y_pred == 0)).sum())
-    tp = int(((y_true == 1) & (y_pred == 1)).sum())
-
+    y_pred = (scores > tau).astype(int)  # 1 = flagged as outlier/fraud
+    tn = np.sum((y_true == 0) & (y_pred == 0))
+    fp = np.sum((y_true == 0) & (y_pred == 1))
+    fn = np.sum((y_true == 1) & (y_pred == 0))
+    tp = np.sum((y_true == 1) & (y_pred == 1))
     fpr = fp / (fp + tn + 1e-12)
     tpr = tp / (tp + fn + 1e-12)
-    precision = tp / (tp + fp + 1e-12)
-
-    return {
-        "tau": float(tau),
-        "tn": tn, "fp": fp, "fn": fn, "tp": tp,
-        "fpr": float(fpr),
-        "tpr": float(tpr),
-        "precision": float(precision),
-    }
+    return fpr, tpr, tn, fp, fn, tp
