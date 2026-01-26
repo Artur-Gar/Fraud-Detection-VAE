@@ -42,6 +42,10 @@ The repository consists of two main components:
   - supervised baseline training + evaluation
   - VAE-based anomaly detection
   - conformal calibration and analysis
+  
+- **FraudGuard report**
+  Outlines the theoretical basis and presents a comprehensive overview of the results.
+    
 
 All evaluation plots (ROC/PR/confusion matrices) are automatically saved under:
 - notebooks/output_baseline_conformal/
