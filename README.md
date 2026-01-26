@@ -33,14 +33,14 @@ The system is designed for extremely imbalanced settings (< 0.2% fraud) and emph
 <div align="center">
 
 **Supervised Baseline**
-  
-![Baseline ROC](notebooks/output_baseline_conformal/conformal_baseline_auc.png)
-![Baseline PR](notebooks/output_baseline_conformal/conformal_baseline_pr.png)
+<img src="notebooks/output_baseline_conformal/conformal_baseline_auc.png" width="45%">
+<img src="notebooks/output_baseline_conformal/conformal_baseline_pr.png" width="45%">
+
+<br><br>
 
 **VAE (Unsupervised)**
-  
-![VAE ROC](notebooks/outputs_vae_conformal/conformal_vae_roc.png)
-![VAE PR](notebooks/outputs_vae_conformal/conformal_vae_pr.png)
+<img src="notebooks/outputs_vae_conformal/conformal_vae_roc.png" width="45%">
+<img src="notebooks/outputs_vae_conformal/conformal_vae_pr.png" width="45%">
 
 </div>
 
