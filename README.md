@@ -28,6 +28,22 @@ The system is designed for extremely imbalanced settings (< 0.2% fraud) and emph
   - ROC-AUC (VAE): 0.9343
   - Statistically valid calibration on test set (α → empirical FPR closely matched)
 
+### 📊 Empirical Results (ROC & PR Curves)
+
+<div align="center">
+
+**Supervised Baseline**
+  
+![Baseline ROC](notebooks/output_baseline_conformal/conformal_baseline_auc.png)
+![Baseline PR](notebooks/output_baseline_conformal/conformal_baseline_pr.png)
+
+**VAE (Unsupervised)**
+  
+![VAE ROC](notebooks/outputs_vae_conformal/conformal_vae_roc.png)
+![VAE PR](notebooks/outputs_vae_conformal/conformal_vae_pr.png)
+
+</div>
+
 ---
 
 ## 🏗 Repository Structure
