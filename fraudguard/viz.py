@@ -1,11 +1,24 @@
 import numpy as np
+from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import roc_curve, precision_recall_curve, auc, average_precision_score
 
-def plot_confusion_matrix(y_true, y_pred, title="Confusion Matrix"):
+def plot_confusion_matrix(
+    y_true,
+    y_pred,
+    title="Confusion Matrix",
+    title_prefix="",
+    save_path=None
+):
     from sklearn.metrics import confusion_matrix
     cm = confusion_matrix(y_true, y_pred)
+
+    # prepare save directory if provided
+    save_dir = None
+    if save_path is not None:
+        save_dir = Path(save_path)
+        save_dir.mkdir(parents=True, exist_ok=True)
 
     plt.figure(figsize=(6, 5))
     sns.heatmap(
@@ -16,7 +29,15 @@ def plot_confusion_matrix(y_true, y_pred, title="Confusion Matrix"):
     plt.xlabel('Predicted Label')
     plt.ylabel('True Label')
     plt.title(title)
+    plt.tight_layout()
+
+    # save
+    if save_dir is not None:
+        filename = f"{title_prefix}confusion_matrix.png" if title_prefix else "confusion_matrix.png"
+        plt.savefig(save_dir / filename, dpi=300, bbox_inches="tight")
+
     plt.show()
+
 
 def _add_annotation_legend_with_arrows(ax, points, title=None,
                                       x_text=1.02, y_top=0.90, y_step=0.07):
@@ -46,7 +67,8 @@ def plot_roc_pr_with_conformal_points(
     taus_by_alpha,
     best_f1_tau=None,
     f1=None,
-    title_prefix=""
+    title_prefix="",
+    save_path=None
 ):
     """
     y_true: 0/1 labels
@@ -56,6 +78,12 @@ def plot_roc_pr_with_conformal_points(
     """
     y_true = np.asarray(y_true).reshape(-1).astype(int)
     scores = np.asarray(scores).reshape(-1)
+
+    # prepare save directory if needed
+    save_dir = None
+    if save_path is not None:
+        save_dir = Path(save_path)
+        save_dir.mkdir(parents=True, exist_ok=True)
 
     # ============================
     # ROC
@@ -110,6 +138,12 @@ def plot_roc_pr_with_conformal_points(
     ax.grid(True, alpha=0.25)
     ax.legend(loc="lower right")
     plt.tight_layout(rect=[0, 0, 0.82, 1])
+
+    # save ROC if requested
+    if save_dir is not None:
+        roc_filename = f"{title_prefix}roc.png" if title_prefix else "roc.png"
+        plt.savefig(save_dir / roc_filename, dpi=300, bbox_inches="tight")
+
     plt.show()
 
     # ============================
@@ -165,4 +199,10 @@ def plot_roc_pr_with_conformal_points(
     ax.grid(True, alpha=0.25)
     ax.legend(loc="lower left")
     plt.tight_layout(rect=[0, 0, 0.82, 1])
+
+    # save PR if requested
+    if save_dir is not None:
+        pr_filename = f"{title_prefix}pr.png" if title_prefix else "pr.png"
+        plt.savefig(save_dir / pr_filename, dpi=300, bbox_inches="tight")
+
     plt.show()
