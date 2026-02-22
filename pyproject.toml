@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fraudguard"
+version = "0.1.0"
+description = "Fraud detection utilities with conformal calibration"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy",
+  "pandas",
+  "scikit-learn",
+  "torch",
+  "matplotlib",
+  "seaborn",
+  "tqdm"
+]
+
+[project.optional-dependencies]
+notebooks = [
+  "jupyter",
+  "ipykernel"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+

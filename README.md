@@ -1,48 +1,68 @@
-# FraudGuard — Deep Anomaly Detection with Conformal Prediction
+## FraudGuard — Deep Anomaly Detection with Conformal Prediction
 
-This repository implements a two-stage credit card fraud detection system combining:
+## Description
+FraudGuard is a learning project focused on fraud detection in highly imbalanced credit card transaction data. The repository provides reusable Python modules for data splitting, conformal calibration, evaluation metrics, and visualization. The objective is to evaluate different detection paradigms and apply conformal prediction to obtain statistically controlled decision thresholds.
 
-1. **Supervised classification** (upper-bound benchmark using labeled fraud)
-2. **Unsupervised anomaly detection** via a Variational Autoencoder (VAE)
-3. **Inductive Conformal Prediction (ICP)** for calibrated risk control and statistically guaranteed false positive bounds
+1. **Supervised classification** — MLP neural network trained on labeled fraud to provide an approximate upper-bound baseline
+2. **Unsupervised anomaly detection** — Variational Autoencoder (VAE) for detecting rare/abnormal transaction patterns
+3. **Inductive Conformal Prediction (ICP)** — distribution-free uncertainty quantification with guaranteed control over false positive rates
 
-The system is designed for extremely imbalanced settings (< 0.2% fraud) and emphasizes operational deployment concerns such as threshold selection, interpretability, and risk management.
+The system is designed for extreme imbalance (<0.2% fraud) and prioritizes operational aspects such as threshold selection, interpretability, and risk-aware deployment.
 
----
+## Results
+- Supervised baseline ROC-AUC: `0.9758`.
+- VAE ROC-AUC: `0.9343`.
+- Statistically valid calibration on test set (α → empirical FPR closely matched).
+### Empirical Results (ROC & PR Curves)
+<div align="center">
 
-## ✨ Key Contributions
+<b>Supervised Baseline</b><br>
+<img src="docs/figures/figures_baseline_conformal/conformal_baseline_auc.png" width="45%">
+<img src="docs/figures/figures_baseline_conformal/conformal_baseline_pr.png" width="45%">
 
-- **Supervised Baseline (FCN)**  
-  Establishes upper-bound performance using weighted binary classification.
+<br>
 
-- **Unsupervised VAE**  
-  Learns a representation of “normal” behaviour without fraud labels.
+<b>VAE (Unsupervised)</b><br>
+<img src="docs/figures/figures_vae_conformal/conformal_vae_roc.png" width="45%">
+<img src="docs/figures/figures_vae_conformal/conformal_vae_pr.png" width="45%">
 
-- **Conformal Calibration (ICP)**  
-  Converts raw anomaly scores into risk-controlled decisions with guaranteed False Positive Rate (FPR):
+</div>
 
-  > “We can afford to audit α% of legitimate transactions” → ICP computes the corresponding operational threshold.
+**Operational Choice**.
+Comparing the two models, the α = 0.1% operating point emerges
+as a strong candidate for deployment. It resides close to the optimal F1 region for the
+Supervised model and captures the efficient frontier of the VAE. This threshold offers a
+"good enough" balance—it is sufficiently close to the best statistical performance (F1)
+while providing the business with a hard guarantee on the maximum number of daily false
+alarms (operational cost).
 
-- **Strong empirical performance**
-  - ROC-AUC (supervised): 0.9758
-  - ROC-AUC (VAE): 0.9343
-  - Statistically valid calibration on test set (α → empirical FPR closely matched)
+## Installation
+```bash
+poetry install
+poetry shell
+```
 
----
+## Usage
+Run the study workflows:
+```bash
+jupyter notebook notebooks/SupervisedBaseline.ipynb
+jupyter notebook notebooks/VAE.ipynb
+```
 
-## 🏗 Repository Structure
+## Project Structure
+- `src/`        Importable package code (`fraudguard` modules)
+- `data/raw/`   Dataset used by experiments
+- `notebooks/`  Supervised and VAE experiment notebooks
+- `models/`     Saved model checkpoints
+- `docs/`       Report and generated evaluation figures
 
-The repository consists of two main components:
+## Technical Highlights
+- Shared data preparation logic supports both supervised and unsupervised workflows from one split interface.
+- Conformal thresholds are derived from calibration scores to map risk tolerance to decision cutoffs.
+- Plotting utilities place conformal operating points directly on ROC/PR curves for visual comparison.
+- Training and evaluation are separated into reusable package functions and notebook-level orchestration.
 
-- **Core package (`fraudguard/`)**  
-  Contains reusable modules for datasets, metrics, conformal calibration, and visualization.
+## Report
+Full project report covering the theoretical foundations, methodology, and results: 
 
-- **Notebooks (`notebooks/`)**  
-  Self-contained experiments demonstrating:
-  - supervised baseline training + evaluation
-  - VAE-based anomaly detection
-  - conformal calibration and analysis
-
-All evaluation plots (ROC/PR/confusion matrices) are automatically saved under:
-- notebooks/output_baseline_conformal/
-- notebooks/outputs_vae_conformal/
+[`docs/FraudGuard_report.pdf`](docs/FraudGuard_report.pdf)
